@@ -17,7 +17,7 @@ namespace Web.Middleware
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context, ILogger logger)
+        public async Task Invoke(HttpContext context, ILogger<ErrorHandlingMiddleware> logger)
         {
             try
             {
@@ -33,11 +33,13 @@ namespace Web.Middleware
             }
         }
 
-        private static Task HandleDomainExceptionAsync(HttpContext context, BaseDomainException ex, ILogger logger = null)
+        private static Task HandleDomainExceptionAsync(HttpContext context, BaseDomainException ex, ILogger<ErrorHandlingMiddleware> logger = null)
         {
             var serverErrorCode = ex.ErrorCode;
             var message = ex.Message;
-            logger?.LogWarning($"User: {context.User.Identity.Name} got an error: {message} with error code: {serverErrorCode}");
+            var userName = context.User.Identity.Name;
+
+            logger?.LogWarning("User: {UserName} got an error: {Message} with error code: {ServerErrorCode}", userName, message, serverErrorCode);
 
             var result = JsonConvert.SerializeObject(new { errorCode = serverErrorCode, error = message });
             context.Response.ContentType = "application/json";
@@ -45,9 +47,12 @@ namespace Web.Middleware
             return context.Response.WriteAsync(result);
         }
 
-        private static Task HandleExceptionAsync(HttpContext context, Exception ex, ILogger logger = null)
+        private static Task HandleExceptionAsync(HttpContext context, Exception ex, ILogger<ErrorHandlingMiddleware> logger = null)
         {
-            logger?.LogError(ex, $"User: {context.User.Identity.Name} got an error: {ex.Message}");
+            var userName = context.User.Identity.Name;
+            var message = ex.Message;
+
+            logger?.LogError("User: {UserName} got an error: {Message}", userName, message);
             
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
