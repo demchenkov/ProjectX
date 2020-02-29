@@ -17,7 +17,7 @@ namespace Web.Middleware
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context, ILogger logger)
+        public async Task Invoke(HttpContext context)
         {
             try
             {
@@ -25,11 +25,15 @@ namespace Web.Middleware
             }
             catch (BaseDomainException ex)
             {
-                await HandleDomainExceptionAsync(context, ex, logger);
+                await HandleDomainExceptionAsync(context, ex);
+            }
+            catch (AggregateException ex)
+            {
+                await HandleAggregateExceptionAsync(context, ex);
             }
             catch (Exception ex)
             {
-                await HandleExceptionAsync(context, ex, logger);
+                await HandleExceptionAsync(context, ex);
             }
         }
 
@@ -43,6 +47,14 @@ namespace Web.Middleware
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int) ex.HttpStatusCode;
             return context.Response.WriteAsync(result);
+        }
+
+        private static Task HandleAggregateExceptionAsync(HttpContext context, AggregateException ex, ILogger logger = null)
+        {
+            if (ex.GetBaseException() is BaseDomainException innerException)
+                return HandleDomainExceptionAsync(context, innerException, logger);
+
+            return HandleExceptionAsync(context, ex.GetBaseException(), logger);
         }
 
         private static Task HandleExceptionAsync(HttpContext context, Exception ex, ILogger logger = null)
