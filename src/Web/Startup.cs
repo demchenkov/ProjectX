@@ -1,10 +1,13 @@
+using AutoMapper;
+
 using Core.Interfaces.Providers;
+using Core.Interfaces.Services;
 using Infrastructure.ExternalServices.Implementation.JwtEncodingKey;
 using Infrastructure.ExternalServices.Interfaces.JwtEncodingKey;
 using Infrastructure.Providers;
 using Infrastructure.Repositories.Implements;
 using Infrastructure.Repositories.Interfaces;
-
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -15,7 +18,7 @@ using Microsoft.Extensions.Hosting;
 
 using Web.ExtensionMethods;
 
-using DbContext = Infrastructure.DbContext;
+using DbContext = Infrastructure.Data.DbContext;
 
 namespace Web
 {
@@ -33,6 +36,8 @@ namespace Web
         {
             var connectionString = Configuration.GetConnectionString("PostgreSQLConnection");
 
+            services.AddAutoMapper(typeof(Startup));
+
             services.AddDbContext<DbContext>(options =>
                 options.UseNpgsql(connectionString));
 
@@ -46,7 +51,8 @@ namespace Web
             services.AddSingleton<IJwtSigningDecodingKey, SigningSymmetricKey>();
 
             services.AddTransient<ITokenProvider, TokenProvider>();
-
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<ILocationRepository, LocationRepository>();
             services.AddBearerAuth(Configuration);
         }
 

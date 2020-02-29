@@ -2,6 +2,9 @@
 {
     public enum ErrorCode
     {
-        UserNotFound
+        UserNotFound,
+        UserAlreadyExist,
+        CannotCreateUser,
+
     }
 }
