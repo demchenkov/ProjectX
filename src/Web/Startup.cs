@@ -41,6 +41,8 @@ namespace Web
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
             });
+
+            services.AddSerilog(Configuration);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -58,8 +60,6 @@ namespace Web
             }
 
             app.UseErrorHandling();
-
-            app.UseRouting();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
