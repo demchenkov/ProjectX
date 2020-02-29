@@ -14,8 +14,6 @@ namespace Web.ExtensionMethods
     {
         public static IServiceCollection AddBearerAuth(this IServiceCollection services, IConfiguration configuration)
         {
-            
-
             var serviceProvider = services.BuildServiceProvider();
             // Resolve the services from the service provider
             var decodingKey = serviceProvider.GetService<IJwtSigningDecodingKey>();
