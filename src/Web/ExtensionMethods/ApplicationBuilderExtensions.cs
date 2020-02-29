@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Web.Middleware;
 
-namespace Web.Middleware.ExtensionMethods
+namespace Web.ExtensionMethods
 {
     public static class ApplicationBuilderExtensions
     {

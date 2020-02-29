@@ -1,6 +1,6 @@
 ﻿using Infrastructure.ExternalServices.Interfaces;
 
-namespace Infrastructure.ExternalServices
+namespace Infrastructure.ExternalServices.Implementation
 {
     public class EmailSender : IEmailSender
     {

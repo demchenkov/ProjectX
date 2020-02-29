@@ -1,5 +1,10 @@
+using Core.Interfaces.Providers;
+using Infrastructure.ExternalServices.Implementation.JwtEncodingKey;
+using Infrastructure.ExternalServices.Interfaces.JwtEncodingKey;
+using Infrastructure.Providers;
 using Infrastructure.Repositories.Implements;
 using Infrastructure.Repositories.Interfaces;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -7,7 +12,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Web.Middleware.ExtensionMethods;
+
+using Web.ExtensionMethods;
+
 using DbContext = Infrastructure.DbContext;
 
 namespace Web
@@ -34,7 +41,13 @@ namespace Web
 
             services.AddControllers().AddNewtonsoftJson();
 
-            services.AddTransient<ILocationRepository, LocationRepository>();
+            services.RegisterAllOptions(Configuration);
+            services.AddSingleton<IJwtSigningEncodingKey, SigningSymmetricKey>();
+            services.AddSingleton<IJwtSigningDecodingKey, SigningSymmetricKey>();
+
+            services.AddTransient<ITokenProvider, TokenProvider>();
+
+            services.AddBearerAuth(Configuration);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
