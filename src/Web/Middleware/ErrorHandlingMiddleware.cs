@@ -18,6 +18,7 @@ namespace Web.Middleware
         }
 
         public async Task Invoke(HttpContext context, ILogger<ErrorHandlingMiddleware> logger)
+
         {
             try
             {
@@ -25,11 +26,15 @@ namespace Web.Middleware
             }
             catch (BaseDomainException ex)
             {
-                await HandleDomainExceptionAsync(context, ex, logger);
+                await HandleDomainExceptionAsync(context, ex);
+            }
+            catch (AggregateException ex)
+            {
+                await HandleAggregateExceptionAsync(context, ex);
             }
             catch (Exception ex)
             {
-                await HandleExceptionAsync(context, ex, logger);
+                await HandleExceptionAsync(context, ex);
             }
         }
 
@@ -46,6 +51,7 @@ namespace Web.Middleware
             context.Response.StatusCode = (int) ex.HttpStatusCode;
             return context.Response.WriteAsync(result);
         }
+
 
         private static Task HandleExceptionAsync(HttpContext context, Exception ex, ILogger<ErrorHandlingMiddleware> logger = null)
         {

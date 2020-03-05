@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Core.Entities;
 using Infrastructure.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers
@@ -18,9 +19,11 @@ namespace Web.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IEnumerable<Location>> Get()
         {
             // test url: https://localhost:44364/api/location
+            // test url: https://localhost:44364/api/location/getAll
             return await _repository.GetAll();
         }
     }
